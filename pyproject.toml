@@ -1,0 +1,56 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "short2short"
+version = "0.1.0"
+description = "Topic to short video: script, narration, subtitles, AI or stock clips."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "pydantic>=2.10",
+    "typer>=0.15",
+    "rich>=13.9",
+    "httpx>=0.28",
+    "edge-tts>=7.0",
+    "openai>=1.60",
+    "keyring>=25.5",
+    "websocket-client>=1.8",
+    "tomli-w>=1.1",
+    "google-genai>=1.0",
+]
+
+[project.scripts]
+short2short = "short2short.cli:app"
+
+[dependency-groups]
+dev = ["pytest>=8.3", "ruff>=0.9", "mypy>=1.14", "respx>=0.22"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/short2short"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+strict = true
+python_version = "3.13"
+packages = ["short2short"]
+mypy_path = "src"
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["edge_tts.*", "google.*", "tomli_w.*", "keyring.*", "websocket.*"]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = ["-m", "not integration", "--strict-markers", "--import-mode=importlib"]
+markers = ["integration: needs ffmpeg on PATH; excluded by default addopts"]
